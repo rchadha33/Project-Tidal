@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>TidalWaves.Tech</title>
+<title>Tidal Power @ Hacklytics</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
@@ -48,7 +48,7 @@
             color: #fff;
             font-size: 11px;
             padding: 10px;
-            width: 200px;
+            width: 250px;
             background-color: #03021f;
             border: #fff .25px solid;
             
@@ -62,7 +62,7 @@
             text-align: center;
         }
         .mapboxgl-popup-content p {
-            font-size: 10px;
+            font-size: 15px;
             margin: 10px 0;
 
         }
@@ -99,7 +99,7 @@
                 <h1>Project Tidal</h1> 
         </div>
         <button id="resetButton">Reset</button>
-        <div id="legend" style="position: absolute; top: 100px; right: 20px; background: #010b19; padding: 10px; box-shadow: 0 1px 2px midnightblue; z-index: 2;">
+        <div id="legend" style="position: absolute; top: 100px; right: 30px; background: #010b19; padding: 10px; box-shadow: 0 1px 2px midnightblue; z-index: 2;">
         <!-- Legend will be added here -->
     </div>  
 <div id="map">
@@ -124,6 +124,92 @@ document.getElementById('resetButton').addEventListener('click', function() {
 
         map.on('load', () => {
         // Add your map layers and sources here
+        map.on('mouseenter', 'combined-updated-countries-8uj1zx', function (e) {
+    map.getCanvas().style.cursor = 'pointer';
+
+    // Ensure only one popup is active at a time
+    if (popup) {
+        popup.remove();
+    }
+
+    // Extract CO2 Emissions data and country name from the feature properties
+    const properties = e.features[0].properties;
+    const CO2Emissions = properties['Carbon Emissions'];
+    const countryName = properties.Country; // Make sure this matches the actual property name
+
+    // Updated HTML content for the popup to include "CO2 Emissions in <Country>"
+    const popupContent = `<h3>CO2 Emissions ${countryName}</h3><p style="color: maroon; text-align: center;"><b>${CO2Emissions} M-Tons</p>`;
+
+    // Create a popup and add it to the map
+    popup = new mapboxgl.Popup({ offset: 25 })
+        .setLngLat(e.lngLat)
+        .setHTML(popupContent)
+        .addTo(map);
+});
+
+map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
+    map.getCanvas().style.cursor = '';
+    if (popup) {
+        popup.remove();
+        popup = null; // Ensure the popup variable is cleared after removal
+    }
+});
+
+
+            map.on('mouseenter', 'combined-updated-countries-8uj1zx', function (e) {
+        if (e.features.length > 0) {
+            if (hoveredCountryId !== null) {
+                map.setFeatureState(
+                    { source: 'your-source', id: hoveredCountryId },
+                    { hover: false }
+                );
+            }
+            hoveredCountryId = e.features[0].id;
+            map.setFeatureState(
+                { source: 'your-source', id: hoveredCountryId },
+                { hover: true }
+            );
+
+            map.getCanvas().style.cursor = 'pointer';
+
+            var popup = new mapboxgl.Popup({ offset: [0, -15] })
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>' + e.features[0].properties.name + '</h3><p>' + e.features[0].properties['Carbon Emissions'] + ' M-Tons CO2</p>')
+                .addTo(map);
+        }
+    });
+
+    map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
+        map.getCanvas().style.cursor = '';
+        if (hoveredCountryId !== null) {
+            map.setFeatureState(
+                { source: 'your-source', id: hoveredCountryId },
+                { hover: false }
+            );
+        }
+        hoveredCountryId = null;
+
+        if (popup) {
+            popup.remove();
+        }
+    });
+
+    // Define the paint properties for the hover state
+    map.addLayer({
+        'id': 'combined-updated-countries-8uj1zx',
+        'type': 'fill',
+        'source': 'your-source', // replace with your source
+        'paint': {
+            'fill-color': '#627BC1',
+            'fill-opacity': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                0.5, // opacity value when hovered
+                0.0  // opacity value when not hovered
+            ]
+        }
+    });
+    
 
         const legend = document.getElementById('legend');
 
@@ -219,7 +305,7 @@ map.on('click', () => {
         legend.appendChild(titleColor);
 
         // Add color scale
-        const colors = ['#ebe64c', '#c2dd5f', '#9ac874', '#77a682', '#5b7c8b', '#424a80', '#2f0863']; // Example colors, use your actual color stops
+        const colors = ['#ebe64c', '#c2dd5f', '#9ac874', '#77a682', '#5b7c8b', '#424a80', '#2f0863']; 
         const colorContainer = document.createElement('div');
         colorContainer.className = 'legend-scale';
         colors.forEach(color => {
@@ -229,6 +315,26 @@ map.on('click', () => {
                 colorContainer.appendChild(colorDiv);
         });
         legend.appendChild(colorContainer);
+
+const titleChlor = document.createElement('div');
+titleChlor.className = 'legend-title';
+titleChlor.textContent = 'CO2 Emissions M-Tons';
+legend.appendChild(titleChlor);
+
+// Add color scale for CO2 Emissions
+const colors2 = ['#3b6f1b', '#856a19', '#915608', '#792820']; 
+const colorContainer2 = document.createElement('div');
+colorContainer2.className = 'legend-scale';
+colors2.forEach(color => {
+    const colorDiv2 = document.createElement('div');
+    colorDiv2.className = 'legend-color';
+    colorDiv2.style.backgroundColor = color;
+    colorContainer2.appendChild(colorDiv2); // Append colorDiv2 instead of colorDiv
+});
+legend.appendChild(colorContainer2);
+
+
+        
 
         var popup = new mapboxgl.Popup({
     closeButton: false,
