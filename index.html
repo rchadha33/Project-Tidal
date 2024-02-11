@@ -148,8 +148,14 @@ document.getElementById('resetButton').addEventListener('click', function() {
     const countryName = properties.Country; // Make sure this matches the actual property name
 
     // Updated HTML content for the popup to include "CO2 Emissions in <Country>"
-    const popupContent = `<h3>CO2 Emissions ${countryName}</h3><p style="color: maroon; text-align: center;"><b>${CO2Emissions} M-Tons</p>`;
-
+    const popupContent = `<h3>CO2 Emissions ${countryName}</h3>
+        <p style="color: maroon; text-align: center;"><b>${CO2Emissions} M-Tons</b></p>
+        <p style="text-align: center;"><strong>Oil Cost:</strong> $2,892,003,479.00</p>
+        <p style="text-align: center;"><strong>Natural Gas Cost:</strong> $195,481,080,012.73</p>
+        <p style="text-align: center;"><strong>Coal Cost:</strong> $18,375,778,907.54</p>
+        <p style="text-align: center;"><strong>Nuclear Cost:</strong> $365,727,519.99</p>
+        <p style="text-align: center;"><strong>Hydroelectric Cost:</strong> $97,067,165.37</p>
+        <p style="text-align: center;"><strong>Renewable Cost:</strong> $421,353,380.38</p>`;
     // Create a popup and add it to the map
     popup = new mapboxgl.Popup({ offset: 25 })
         .setLngLat(e.lngLat)
