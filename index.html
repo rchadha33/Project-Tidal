@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TidalWaves.Tech</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        body { margin: 0; padding: 0; }
+        .header-banner { background-color: black; color: white; padding: 10px; text-align: center; }
+        #map { position: absolute; top: 80px; bottom: 0; width: 100%; }
+        #legend {
+            font-family: Arial, sans-serif;
+            background: #fff;
+            padding: 5px;
+            margin: 5px;
+            border: 2px steelblue;
+            border-radius: 5px;
+        }
+        .legend-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+        .legend-scale {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2.5px;
+        }
+        .legend-size {
+            display: inline-block;
+            background-color: teal;
+            border-radius: 50%;
+            border: #fff 1px solid;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            margin: 0 5px;
+            border: 1px solid #777;
+        }
+        .mapboxgl-popup-content {
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            font-size: 11px;
+            padding: 10px;
+            width: 200px;
+            background-color: #03021f;
+            border: #fff .25px solid;
+            
+        }
+        button.mapboxgl-popup-close-button {
+            color: #fff;
+        }
+        .mapboxgl-popup-content h3 {
+            font-size: 11px;
+            margin: 0 0 10px;
+            text-align: center;
+        }
+        .mapboxgl-popup-content p {
+            font-size: 10px;
+            margin: 10px 0;
+
+        }
+        .mapboxgl-popup-content strong {
+            color: rgb(23, 212, 194);
+        }
+        .mapboxgl-popup-content u {
+            text-decoration: none;
+            border-bottom: 1px dotted rgb(255, 255, 255);
+        }
+
+        #resetButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 3; 
+        padding: 20px 20px;
+        background-color: #010b19;
+        border: rgb(255, 255, 255) .25px solid;
+        border-radius: 2px;
+        cursor: pointer;
+        color:rgb(23, 212, 194);
+        transition: background-color 0.3s ease-in-out;
+}
+
+#resetButton:hover {
+        background-color: #024769;
+}
+        
+</style>
+</head>
+<body>
+        <div class="header-banner">
+                <h1>Project Tidal</h1> 
+        </div>
+        <button id="resetButton">Reset</button>
+        <div id="legend" style="position: absolute; top: 100px; right: 20px; background: #010b19; padding: 10px; box-shadow: 0 1px 2px midnightblue; z-index: 2;">
+        <!-- Legend will be added here -->
+    </div>  
+<div id="map">
+
+<script>
+
+document.getElementById('resetButton').addEventListener('click', function() {
+        window.location.reload();
+});
+
+
+	mapboxgl.accessToken = 'pk.eyJ1IjoicmNoYWRoYTMzIiwiYSI6ImNsb296ZHB6ejAydjIyanB0em5tb2tlN3UifQ.3O7_wv9OO6UJQ_DO9cm1yw';
+        const map = new mapboxgl.Map({
+                container: 'map',
+        style: 'mapbox://styles/rchadha33/clorj9ihl00g101qo0jopgk6g',
+        center: [-95.678966, 42.104642], // Set the map center to the specified coordinates
+        zoom: 0.83, // Set the zoom level to the specified value
+        pitch: 0, // Set the pitch (tilt) of the map to the specified value
+        bearing: 0, // Set the bearing (rotation) of the map to the specified value
+        projection: 'globe' // This will set the map's projection to a globe
+});
+
+        map.on('load', () => {
+        // Add your map layers and sources here
+
+        const legend = document.getElementById('legend');
+
+        // Add title to the legend
+        const titleSize = document.createElement('div');
+        titleSize.className = 'legend-title';
+        titleSize.textContent = 'Wave Energy Potential';
+        legend.appendChild(titleSize);
+
+        // Create a size scale
+        // (You will need to adjust sizes proportionally to fit them inside the legend)
+        const sizes = [5, 10, 15, 20, 25]; // Example sizes, adjust based on your actual size scale
+        const sizeContainer = document.createElement('div');
+        sizeContainer.className = 'legend-scale';
+        sizes.forEach((size, index) => {
+        const sizeDiv = document.createElement('div');
+        sizeDiv.className = 'legend-size';
+        sizeDiv.style.width = size + 'px';
+        sizeDiv.style.height = size + 'px';
+        sizeDiv.style.marginRight = '5px'; // Adjust the right margin as needed
+        // Only add margin to the left if it's not the first item
+        if (index > 0) {
+                sizeDiv.style.marginLeft = '18px';
+        }
+        sizeContainer.appendChild(sizeDiv);
+        // Create a container for the chart
+const chartContainer = document.createElement('div');
+chartContainer.id = 'chartContainer';
+chartContainer.style.display = 'none'; // Start hidden
+document.body.appendChild(chartContainer);
+
+// Prepare a function to create a chart
+function createEnergyCostChart(countryData) {
+    // Assuming 'countryData' is an object with the cost data
+    const ctx = document.getElementById('chartContainer').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar', // Choose the chart type: bar, line, etc.
+        data: {
+            labels: Object.keys(countryData), // e.g., ['Oil', 'Natural Gas', 'Coal', ...]
+            datasets: [{
+                label: 'Energy Cost ($)',
+                data: Object.values(countryData), // e.g., [341349601.75, 26981041108.50, ...]
+                backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    return chart;
+}
+
+// Listen for a click on the map to create and show the chart
+map.on('click', 'country-boundaries', (e) => {
+    // Get the country data (you will need to implement the data retrieval)
+    const countryData = getCountryData(e.features[0].properties.name);
+
+    // Create the chart with the country data
+    const chart = createEnergyCostChart(countryData);
+
+    // Show the chart container
+    chartContainer.style.display = 'block';
+});
+
+// Function to hide the chart
+function hideChart() {
+    chartContainer.style.display = 'none';
+    // If you stored your chart instance globally, you should also destroy it
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+}
+
+// Add an event listener to hide the chart when the map is clicked
+map.on('click', () => {
+    hideChart();
+});
+
+});
+
+        legend.appendChild(sizeContainer);
+
+        // Add title to the legend
+        const titleColor = document.createElement('div');
+        titleColor.className = 'legend-title';
+        titleColor.textContent = 'Wind Energy Potential';
+        legend.appendChild(titleColor);
+
+        // Add color scale
+        const colors = ['#ebe64c', '#c2dd5f', '#9ac874', '#77a682', '#5b7c8b', '#424a80', '#2f0863']; // Example colors, use your actual color stops
+        const colorContainer = document.createElement('div');
+        colorContainer.className = 'legend-scale';
+        colors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'legend-color';
+                colorDiv.style.backgroundColor = color;
+                colorContainer.appendChild(colorDiv);
+        });
+        legend.appendChild(colorContainer);
+
+        var popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+});
+
+map.on('mouseenter', 'data-driven-circles', function(e) {
+        map.getCanvas().style.cursor = 'pointer';
+
+        if (e.features.length > 0) {
+                var feature = e.features[0];
+                var coordinates = feature.geometry.coordinates.slice();
+                var popupContent = '<h3> <u>Station: ' + feature.properties.id + '</u></h3>';
+
+                // Conditional checks for each property
+                if (feature.properties['wave power'] && feature.properties['wave power'] !== '-' && feature.properties['wave power'] !== '') {
+                        popupContent += '<p><strong>Wave Power:</strong> ' + feature.properties['wave power'] + ' W/m' + '</p>';
+                }
+                if (feature.properties['wind power'] && feature.properties['wind power'] !== '-' && feature.properties['wind power'] !== '') {
+                        popupContent += '<p><strong>Wind Power:</strong> ' + feature.properties['wind power'] + ' W/m<sup>2</sup>' + '</p>';
+                }
+                if (feature.properties['emissions avoided w/ waves'] && feature.properties['emissions avoided w/ waves'] !== '-' && feature.properties['emissions avoided w/ waves'] !== '') {
+                        popupContent += '<p><strong>Emission Reduct. (Waves):</strong> ' + feature.properties['emissions avoided w/ waves'] + ' CO<sub>2</sub>/m' + '</p>';
+                }
+                if (feature.properties['emissions avoided w/ wind'] && feature.properties['emissions avoided w/ wind'] !== '-' && feature.properties['emissions avoided w/ wind'] !== '') {
+                        popupContent += '<p><strong>Emission Reduct. (Wind):</strong> ' + feature.properties['emissions avoided w/ wind'] + ' CO<sub>2</sub>/m<sup>2</sup>' + '</p>';
+                }
+
+                // Set the popup's content and location
+                popup.setLngLat(coordinates)
+                         .setHTML(popupContent)
+                         .addTo(map);
+                         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    }
+
+        }
+});
+
+map.on('mouseleave', 'data-driven-circles', function() {
+        // Remove the popup when the mouse leaves the circle
+        popup.remove();
+});
+
+function fetchAndUpdateMapLayer() {
+  const publicS3Url = 'https://tidalwaves.s3.us-east-2.amazonaws.com/geojson';
+
+  fetch(publicS3Url)
+    .then(response => response.json())
+    .then(jsonData => {
+      // Check if the source exists
+      if (!map.getSource('data-source-id')) {
+        // If the source doesn't exist, create it
+        map.addSource('data-source-id', {
+          type: 'geojson',
+          data: jsonData
+        });
+      } else {
+        // If the source exists, just update its data
+        map.getSource('data-source-id').setData(jsonData);
+      }
+
+      // Update the first layer with new data
+      if (!map.getLayer('power (1)')) {
+        // If the 'power (1)' layer doesn't exist, create it
+        map.addLayer({
+          id: 'power (1)',
+          type: 'circle', // Assuming it's a circle type, adjust as needed
+          source: 'data-source-id',
+          // Define other layer properties as needed
+        });
+      }
+      
+      // Update the second layer with new data
+      if (!map.getLayer('data-driven-circles')) {
+        // If the 'data-driven-circles' layer doesn't exist, create it
+        map.addLayer({
+          id: 'data-driven-circles',
+          type: 'circle', // Adjust as needed
+          source: 'data-source-id',
+          // Define other layer properties as needed
+        });
+      }
+
+      // Note: No need to "update" the layers if they exist since updating the source's data
+      // will automatically reflect in all layers using that source.
+    })
+    .catch(error => console.error('Error fetching real-time data:', error));
+}
+
+// Fetch and update the layers initially
+fetchAndUpdateMapLayer();
+
+// Set an interval to fetch and update the layers every hour
+setInterval(fetchAndUpdateMapLayer, 3600000);
+
+
+
+});
+</script>
+
+</body>
+</html>
