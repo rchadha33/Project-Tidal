@@ -1,7 +1,7 @@
 ## Project-Tidal
 A web app revolutionizing energy economics with geospatial computation and analytics, forecasting tidal power as a key to curbing rising energy costs and emissions.
 
-# https://github.com/rchadha33/Project-Tidal
+# [https://github.com/rchadha33/Project-Tidal](https://rchadha33.github.io/Project-Tidal/)
 
 #### **Overview**
 The government, corporations, and renewable energy enthusiasts all are able to make use of our application as it provides real-time data on the amount of renewable energy that can be produced at numerous locations around the world. Not only can users navigate our application's global map with fluidity, but they will be able to pinpoint locations with the potential for greater renewable energy production than others. Additionally, users are provided with the current amount of CO2 emission outputs across different countries as well as the amount that can be avoided at each location if renewable energy practices are utilized.
