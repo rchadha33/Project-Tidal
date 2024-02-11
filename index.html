@@ -113,6 +113,7 @@
     </div>
 
 <script>
+let popup;
 
 document.getElementById('resetButton').addEventListener('click', function() {
         window.location.reload();
@@ -134,7 +135,7 @@ document.getElementById('resetButton').addEventListener('click', function() {
 
             
         // Add your map layers and sources here
-        map.on('mouseenter', 'combined-updated-countries-8uj1zx', function (e) {
+        map.on('mouseenter', 'test-4y2u06', function (e) {
     map.getCanvas().style.cursor = 'pointer';
 
     // Ensure only one popup is active at a time
@@ -146,7 +147,7 @@ document.getElementById('resetButton').addEventListener('click', function() {
     const properties = e.features[0].properties;
     const CO2Emissions = properties['Carbon Emissions'];
     const countryName = properties.Country; // Make sure this matches the actual property name
-    const Gas = properties['Oil Cost'];
+    const oil = properties['Oil Cost'];
     const natural = properties['Natural Gas Cost'];
     const coal = properties['Coal Cost'];
     const Nuclear = properties['Nuclear Cost'];
@@ -156,7 +157,7 @@ document.getElementById('resetButton').addEventListener('click', function() {
     const popupContent = `<h3>CO2 Emissions ${countryName}</h3>
         <p style="color: maroon; text-align: center;"><b>${CO2Emissions} M-Tons</b></p>
         <p style="text-align: center;"><strong>Oil Cost:</strong>${oil}</p>
-        <p style="text-align: center;"><strong>Natural Gas Cost:</strong> ${Gas}</p>
+        <p style="text-align: center;"><strong>Natural Gas Cost:</strong> ${natural}</p>
         <p style="text-align: center;"><strong>Coal Cost:</strong> ${coal}</p>
         <p style="text-align: center;"><strong>Nuclear Cost:</strong> ${Nuclear}</p>
         <p style="text-align: center;"><strong>Hydroelectric Cost:</strong> ${hydro}</p>
@@ -170,7 +171,7 @@ document.getElementById('resetButton').addEventListener('click', function() {
         .addTo(map);
 });
 
-map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
+map.on('mouseleave', 'test-4y2u06', function () {
     map.getCanvas().style.cursor = '';
     if (popup) {
         popup.remove();
@@ -179,7 +180,7 @@ map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
 });
 
 
-            map.on('mouseenter', 'combined-updated-countries-8uj1zx', function (e) {
+            map.on('mouseenter', 'test-4y2u06', function (e) {
         if (e.features.length > 0) {
             if (hoveredCountryId !== null) {
                 map.setFeatureState(
@@ -202,7 +203,7 @@ map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
         }
     });
 
-    map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
+    map.on('mouseleave', 'test-4y2u06', function () {
         map.getCanvas().style.cursor = '';
         if (hoveredCountryId !== null) {
             map.setFeatureState(
@@ -219,7 +220,7 @@ map.on('mouseleave', 'combined-updated-countries-8uj1zx', function () {
 
     // Define the paint properties for the hover state
     map.addLayer({
-        'id': 'combined-updated-countries-8uj1zx',
+        'id': 'test-4y2u06',
         'type': 'fill',
         'source': 'your-source', // replace with your source
         'paint': {
@@ -352,7 +353,7 @@ colors2.forEach(color => {
     const colorDiv2 = document.createElement('div');
     colorDiv2.className = 'legend-color';
     colorDiv2.style.backgroundColor = color;
-    colorContainer2.appendChild(colorDiv2); // Append colorDiv2 instead of colorDiv
+    colorContainer2.appendChild(colorDiv2); 
 });
 legend.appendChild(colorContainer2);
 
@@ -453,9 +454,6 @@ fetchAndUpdateMapLayer();
 
 // Set an interval to fetch and update the layers every hour
 setInterval(fetchAndUpdateMapLayer, 3600000);
-
-fetchAndDisplayChart();
-
 
 
 });
