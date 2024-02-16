@@ -8,7 +8,7 @@ The government, corporations, and renewable energy enthusiasts all are able to m
 
 #### **Tech Stack Involved:**
 - Node.js
-- AWS (Real Time Data) 
+- AWS & MongoDB(Real Time Data) 
 - - S3
 - - Lambda
 - Mapbox.JS
